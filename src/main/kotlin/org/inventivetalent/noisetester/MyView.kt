@@ -35,6 +35,8 @@ class MyView : View("Bukkit Noise Tester") {
     var frequency = SimpleDoubleProperty(0.5)
     var amplitude = SimpleDoubleProperty(0.5)
 
+    var code = SimpleStringProperty()
+
     override val root = borderpane {
         top {
             vbox {
@@ -109,6 +111,10 @@ class MyView : View("Bukkit Noise Tester") {
                                 maxWidth =numberLabelWidth
                             }
                         }
+                        separator()
+                        field{
+                            textarea (code)
+                        }
                     }
                 }
             }
@@ -126,6 +132,13 @@ class MyView : View("Bukkit Noise Tester") {
         context.fill = Color.GRAY
         context.fillRect(0.0, 0.0, size.toDouble(), size.toDouble())
 
+        var c = generator.value+generatorType.value+"Generator(random";
+        if (isOctaveGenerator.value) {
+            c+=", ${octaves.value}"
+        }
+        c+=")\n"
+        c+="generator.noise(X, Y, "
+
         val rand = Random()
         if (generatorType.value == "Octave") {
             val gen = when (generator.value) {
@@ -134,6 +147,8 @@ class MyView : View("Bukkit Noise Tester") {
                 else -> SimplexOctaveGenerator(rand, octaves.value)
             }
             drawNoise(size, context) { x, y -> gen.noise(x.toDouble(), y.toDouble(), amplitude.value, frequency.value, true) }
+
+            c+="${amplitude.value}, ${frequency.value}"
         } else if (generatorType.value == "Noise") {
             val gen = when (generator.value) {
                 "Simplex" -> SimplexNoiseGenerator(rand)
@@ -141,7 +156,11 @@ class MyView : View("Bukkit Noise Tester") {
                 else -> SimplexNoiseGenerator(rand)
             }
             drawNoise(size, context) { x, y -> gen.noise(x.toDouble(), y.toDouble(), octaves.value, amplitude.value, frequency.value, true) }
+
+            c+="${octaves.value}, ${amplitude.value}, ${frequency.value}"
         }
+        c+=")"
+        code.set(c)
 
         context.restore()
     }
