@@ -68,6 +68,9 @@ class MyView : View("Bukkit Noise Tester") {
                         field("Render Size") {
                             textfield(renderSize)
                         }
+
+                        separator()
+
                         combobox(generatorType, observableListOf("Octave", "Noise"))
                         combobox(generator, observableListOf("Simplex", "Perlin"))
 
@@ -113,7 +116,9 @@ class MyView : View("Bukkit Noise Tester") {
                                 maxWidth =numberLabelWidth
                             }
                         }
+
                         separator()
+
                         field{
                             textarea (code){
                                 prefHeight=80.0
