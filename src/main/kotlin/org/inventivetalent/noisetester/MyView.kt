@@ -84,8 +84,10 @@ class MyView : View("Bukkit Noise Tester") {
                         field("Scale") {
                             slider(0, 100, 1) {
                                 valueProperty().bindBidirectional(scale)
+                                enableWhen(isOctaveGenerator)
                             }
                             textfield(scale){
+                                enableWhen(isOctaveGenerator)
                                 prefWidth = numberLabelWidth
                                 minWidth =numberLabelWidth
                                 maxWidth =numberLabelWidth
@@ -113,7 +115,9 @@ class MyView : View("Bukkit Noise Tester") {
                         }
                         separator()
                         field{
-                            textarea (code)
+                            textarea (code){
+                                prefHeight=80.0
+                            }
                         }
                     }
                 }
@@ -137,7 +141,6 @@ class MyView : View("Bukkit Noise Tester") {
             c+=", ${octaves.value}"
         }
         c+=")\n"
-        c+="generator.noise(X, Y, "
 
         val rand = Random()
         if (generatorType.value == "Octave") {
@@ -146,9 +149,11 @@ class MyView : View("Bukkit Noise Tester") {
                 "Perlin" -> PerlinOctaveGenerator(rand, octaves.value)
                 else -> SimplexOctaveGenerator(rand, octaves.value)
             }
+            gen.setScale(scale.value)
             drawNoise(size, context) { x, y -> gen.noise(x.toDouble(), y.toDouble(), amplitude.value, frequency.value, true) }
 
-            c+="${amplitude.value}, ${frequency.value}"
+            c+="generator.setScale(${scale.value})\n"
+            c+="generator.noise(X, Y, ${amplitude.value}, ${frequency.value})\n"
         } else if (generatorType.value == "Noise") {
             val gen = when (generator.value) {
                 "Simplex" -> SimplexNoiseGenerator(rand)
@@ -157,9 +162,8 @@ class MyView : View("Bukkit Noise Tester") {
             }
             drawNoise(size, context) { x, y -> gen.noise(x.toDouble(), y.toDouble(), octaves.value, amplitude.value, frequency.value, true) }
 
-            c+="${octaves.value}, ${amplitude.value}, ${frequency.value}"
+            c+="generator.noise(X, Y, ${octaves.value}, ${amplitude.value}, ${frequency.value})\n"
         }
-        c+=")"
         code.set(c)
 
         context.restore()
